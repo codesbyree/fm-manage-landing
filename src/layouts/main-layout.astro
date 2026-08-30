@@ -1,5 +1,5 @@
 ---
-import "../styles/global.css";
+import "@/styles/global.css";
 ---
 
 <html lang="en">
@@ -12,6 +12,43 @@ import "../styles/global.css";
         <title>Astro</title>
     </head>
     <body>
-        <slot />
+        <div data-smooth-wrapper>
+            <div data-smooth-content>
+                <slot />
+            </div>
+        </div>
+
+        <script>
+            import { ScrollSmoother, ScrollTrigger } from "@/utils/gsap";
+
+            const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+            let smootherInstance: ScrollSmoother;
+
+            function initSmoothScroll() {
+                if (mediaQuery.matches) return;
+                if (smootherInstance) smootherInstance.kill();
+
+                smootherInstance = ScrollSmoother.create({
+                    wrapper: "[data-smooth-wrapper]",
+                    content: "[data-smooth-content]",
+                    smooth: 0.5,
+                    effects: true,
+                    normalizeScroll: true,
+                });
+            }
+
+            initSmoothScroll();
+
+            document.addEventListener("astro:page-load", initSmoothScroll);
+        </script>
+
+        <style>
+            body,
+            html {
+                margin: 0;
+                padding: 0;
+                overscroll-behavior: none;
+            }
+        </style>
     </body>
 </html>

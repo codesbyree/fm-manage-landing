@@ -1,3 +1,123 @@
-<header>
-    <img src="" alt="" />
+---
+import { Image } from "astro:assets";
+
+import appLogoImage from "@/assets/images/logo.svg";
+
+import ButtonLink from "@/components/ui/button-link.astro";
+
+const menuItems = [
+    { id: "pricing", label: "Pricing" },
+    { id: "product", label: "Product" },
+    { id: "about", label: "About Us" },
+    { id: "careers", label: "Careers" },
+    { id: "community", label: "Community" },
+];
+---
+
+<header class="sticky top-0 left-0 w-full flex justify-center z-100" data-app-header>
+    <div class="w-full max-w-6xl flex items-center justify-between p-4 pt-9 xl:pt-14">
+        <a aria-label="Homepage" href="/">
+            <Image alt="" src={appLogoImage} class="h-5 w-auto" />
+        </a>
+
+        <nav class="fixed hidden xl:flex! xl:static w-full left-0 top-25 xl:w-max" data-navigation>
+            <ul class="flex items-center flex-col p-4 bg-gray-50 w-[calc(100%-40px)] mx-auto xl:flex-row xl:p-0 xl:gap-10 xl:w-max">
+                {
+                    menuItems.map((x) => (
+                        <li class="w-full xl:w-max">
+                            <a
+                                href={"#" + x.id}
+                                class="p-4 py-3 w-full text-center font-medium text-blue-950 text-base xl:p-0 text-nowrap hover:bg-gray-200 transition-transition-colors xl:hover:bg-transparent xl:hover:text-gray-950/60 block"
+                            >
+                                {x.label}
+                            </a>
+                        </li>
+                    ))
+                }
+            </ul>
+        </nav>
+
+        <ButtonLink variant="primary" href="#" class="hidden xl:flex"> Get Started </ButtonLink>
+
+        <button data-button-nav class="xl:hidden w-10 h-10 p-2 relative flex flex-col justify-center gap-1.5 z-50 overflow-hidden">
+            <span data-button-nav-bar class="first w-full h-0.5 bg-black block origin-center"></span>
+            <span data-button-nav-bar class="second w-full h-0.5 bg-black block origin-center"></span>
+            <span data-button-nav-bar class="last w-full h-0.5 bg-black block origin-center"></span>
+            <span class="sr-only">Menu toggle</span>
+        </button>
+    </div>
 </header>
+
+<script>
+    import { gsap } from "@/utils/gsap";
+    import { navigate } from "astro:transitions/client";
+
+    function initAnimation() {
+        const appHeader = document.querySelector("[data-app-header]");
+        const buttonNav = document.querySelector("[data-button-nav]");
+        const navigation = document.querySelector("[data-navigation]");
+
+        if (!appHeader || !buttonNav || !navigation) return;
+
+        const ctx = gsap.context(() => {
+            gsap.from(appHeader, {
+                y: -50,
+                opacity: 0,
+                filter: "blur(10px)",
+                duration: 0.8,
+            });
+
+            const mm = gsap.matchMedia();
+            mm.add("(max-width: 1200px)", () => {
+                let isMenuOpen = false;
+
+                const navbarTl = gsap.timeline({
+                    paused: true,
+                    defaults: {
+                        duration: 0.2,
+                        ease: "back.out(1.5)",
+                    },
+                    onReverseComplete: () => {
+                        navigation.classList.add("hidden");
+                    },
+                });
+
+                navbarTl
+                    .to(".first", { y: 8, rotation: 45 }, 0)
+                    .to(".second", { x: 40, filter: "blur(80px)" }, 0)
+                    .to(".last", { y: -8, rotation: -45 }, 0)
+                    .from(navigation, { y: 45, opacity: 0, filter: "blur(10px)" }, 0);
+
+                function toggleMenu() {
+                    isMenuOpen = !isMenuOpen;
+
+                    if (isMenuOpen && navigation) {
+                        navigation.classList.remove("hidden");
+                        navbarTl.play();
+                    } else navbarTl.reverse();
+                }
+
+                function closeMenu(event: MouseEvent) {
+                    const target = event.target;
+
+                    if (isMenuOpen && appHeader && !appHeader.contains(target as Node)) {
+                        navbarTl.reverse();
+                    }
+                }
+
+                buttonNav.addEventListener("click", toggleMenu);
+                document.addEventListener("click", closeMenu);
+
+                return () => {
+                    buttonNav.removeEventListener("click", toggleMenu);
+                    document.removeEventListener("click", closeMenu);
+                    isMenuOpen = false;
+                };
+            });
+        }, appHeader);
+
+        return ctx;
+    }
+
+    initAnimation();
+</script>
