@@ -1,0 +1,72 @@
+---
+import ButtonLink from "@/components/ui/button-link.astro";
+---
+
+<section data-app-cta class="bg-orange-400 bg-[url('/assets/images/bg-simplify-section-mobile.svg')] xl:bg-[url('/assets/images/bg-simplify-section-desktop.svg')] bg-no-repeat">
+    <div class="mx-auto w-full max-w-6xl py-25 px-4 xl:px-0 flex flex-col gap-8 items-center xl:flex-row xl:justify-between">
+        <div class="xl:max-w-130">
+            <h2 data-split-title class="text-center text-4xl font-medium tracking-tighter text-gray-50 leading-12 xl:text-5xl xl:text-left xl:leading-14">Simplify how your team works today.</h2>
+        </div>
+
+        <div data-animate>
+            <ButtonLink variant="secondary">Get Started</ButtonLink>
+        </div>
+    </div>
+</section>
+
+<script>
+    import { gsap, ScrollTrigger, SplitText } from "@/utils/gsap";
+
+    function initAnimation() {
+        const container = document.querySelector("[data-app-cta]");
+        if (!container) return;
+
+        const ctx = gsap.context(() => {
+            const titleEl = container.querySelector("[data-split-title]");
+
+            const splitTitle = new SplitText(titleEl, {
+                type: "lines,words",
+                linesClass: "overflow-hidden",
+            });
+
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: container,
+                    start: "top 80%",
+                    toggleActions: "play none none none",
+                },
+                defaults: {
+                    duration: 0.5,
+                    ease: "power3.out",
+                },
+            });
+
+            tl.from(splitTitle.words, {
+                yPercent: 100,
+                opacity: 0,
+                filter: "blur(10px)",
+                stagger: 0.04,
+            }).from("[data-animate]", {
+                y: 50,
+                filter: "blur(10px)",
+                opacity: 0,
+                stagger: 0.5,
+            });
+
+            const handleResize = () => {
+                splitTitle.revert();
+                ScrollTrigger.refresh();
+            };
+
+            window.addEventListener("resize", handleResize);
+
+            return () => {
+                window.removeEventListener("resize", handleResize);
+            };
+        }, container);
+
+        return ctx;
+    }
+
+    initAnimation();
+</script>

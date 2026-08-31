@@ -14,14 +14,18 @@ const menuItems = [
 ];
 ---
 
-<header class="sticky top-0 left-0 w-full flex justify-center z-100" data-app-header>
-    <div class="w-full max-w-6xl flex items-center justify-between p-4 pt-9 xl:pt-14">
-        <a aria-label="Homepage" href="/">
+<header class="fixed top-0 left-0 w-full flex justify-center z-100" data-app-header>
+    <div data-header-bg class="absolute w-full h-full backdrop-blur-lg"></div>
+
+    <div class="flex-1 max-w-6xl flex items-center justify-between px-4 pt-9 pb-4 xl:pt-13 xl:px-0 relative z-10">
+        <a aria-label="Homepage" href="/" class="h-max">
             <Image alt="" src={appLogoImage} class="h-5 w-auto" />
         </a>
 
         <nav class="fixed hidden xl:flex! xl:static w-full left-0 top-25 xl:w-max" data-navigation>
-            <ul class="flex items-center flex-col p-4 bg-gray-50 w-[calc(100%-40px)] mx-auto xl:flex-row xl:p-0 xl:gap-10 xl:w-max">
+            <ul
+                class="flex items-center flex-col p-4 bg-white xl:bg-transparent w-[calc(100%-40px)] mx-auto xl:flex-row xl:p-0 xl:gap-10 xl:w-max border border-gray-100 xl:border-none shadow-md shadow-orange-400/30 xl:shadow-none"
+            >
                 {
                     menuItems.map((x) => (
                         <li class="w-full xl:w-max">
@@ -50,17 +54,16 @@ const menuItems = [
 
 <script>
     import { gsap } from "@/utils/gsap";
-    import { navigate } from "astro:transitions/client";
 
     function initAnimation() {
-        const appHeader = document.querySelector("[data-app-header]");
-        const buttonNav = document.querySelector("[data-button-nav]");
-        const navigation = document.querySelector("[data-navigation]");
+        const container = document.querySelector("[data-app-header]");
+        const buttonNav = container?.querySelector("[data-button-nav]");
+        const navigation = container?.querySelector("[data-navigation]");
 
-        if (!appHeader || !buttonNav || !navigation) return;
+        if (!container || !buttonNav || !navigation) return;
 
         const ctx = gsap.context(() => {
-            gsap.from(appHeader, {
+            gsap.from(container, {
                 y: -50,
                 opacity: 0,
                 filter: "blur(10px)",
@@ -100,7 +103,7 @@ const menuItems = [
                 function closeMenu(event: MouseEvent) {
                     const target = event.target;
 
-                    if (isMenuOpen && appHeader && !appHeader.contains(target as Node)) {
+                    if (isMenuOpen && container && !container.contains(target as Node)) {
                         navbarTl.reverse();
                     }
                 }
@@ -114,7 +117,51 @@ const menuItems = [
                     isMenuOpen = false;
                 };
             });
-        }, appHeader);
+
+            mm.add("(min-width: 1210px)", () => {
+                gsap.fromTo(
+                    container,
+                    {
+                        y: 0,
+                    },
+                    {
+                        y: -40,
+                        ease: "none",
+                        scrollTrigger: {
+                            start: 0,
+                            end: 500,
+                            scrub: true,
+                        },
+                    },
+                );
+
+                const resetHeaderPos = () => {
+                    gsap.to(container, { y: 0 });
+                };
+
+                window.addEventListener("resize", resetHeaderPos);
+
+                () => {
+                    window.removeEventListener("resize", resetHeaderPos);
+                };
+            });
+
+            gsap.fromTo(
+                "[data-header-bg]",
+                {
+                    opacity: 0,
+                },
+                {
+                    opacity: 1,
+                    ease: "none",
+                    scrollTrigger: {
+                        start: 0,
+                        end: 500,
+                        scrub: true,
+                    },
+                },
+            );
+        }, container);
 
         return ctx;
     }

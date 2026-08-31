@@ -1,0 +1,117 @@
+---
+const features = [
+    {
+        title: "Track company-wide progress",
+        description:
+            "See how your day-to-day tasks fit into the wider vision. Go from tracking progress at the milestone level all the way done to the smallest of details. Never lose sight of the bigger picture again.",
+    },
+    {
+        title: "Advance built-in reports",
+        description: "Set internal delivery estimates and track progress toward company goals. Our customisable dashboard helps you build out the reports you need to keep key stakeholders informed.",
+    },
+    {
+        title: "Everything you need in one place",
+        description: "Stop jumping from one service to another to communicate, store files, track tasks and share documents. Manage offers an all-in-one team productivity solution.",
+    },
+];
+---
+
+<section data-app-feature class="relative z-10">
+    <div class="w-full max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 px-4 gap-4 xl:px-0 xl:gap-10 pb-25">
+        <div class="relative xl:row-start-1 flex flex-col gap-2 items-center text-center xl:text-left xl:items-start mb-10">
+            <h2 data-split-title class="font-bold text-3xl xl:text-4xl leading-11 text-blue-950 xl:max-w-120">What's different about Manage?</h2>
+            <p data-split-subtitle class="text-base text-blue-950/50 leading-8 xl:max-w-90">
+                Manage provides all the functionality your team needs, without the complexity. Our software is tailor-made for modern digital product teams.
+            </p>
+        </div>
+
+        <div class="space-y-12 overflow-hidden">
+            {
+                features.map((feature, i) => (
+                    <article data-animate class="space-y-2 xl:space-y-4">
+                        <div class="flex items-center gap-3 bg-orange-50 rounded-tl-full rounded-bl-full -mr-4 text-base xl:bg-transparent xl:mr-0 xl:gap-5">
+                            <span class="block p-2 px-6 bg-orange-400 rounded-full text-gray-50 w-max">0{i + 1}</span>
+                            <h3 class="font-bold text-blue-950 tracking-tight">{feature.title}</h3>
+                        </div>
+
+                        <p class="text-blue-950/50 text-base leading-8 xl:ml-22">{feature.description}</p>
+                    </article>
+                ))
+            }
+        </div>
+    </div>
+</section>
+
+<script>
+    import { gsap, ScrollTrigger, SplitText } from "@/utils/gsap";
+
+    function initAnimation() {
+        const container = document.querySelector("[data-app-feature]");
+
+        if (!container) return;
+
+        const ctx = gsap.context(() => {
+            const titleEl = container.querySelectorAll("[data-split-title]");
+            const subEl = container.querySelectorAll("[data-split-subtitle]");
+
+            const splitTitle = new SplitText(titleEl, {
+                type: "lines,words",
+                linesClass: "overflow-hidden",
+            });
+
+            const splitSub = new SplitText(subEl, {
+                type: "lines",
+                linesClass: "overflow-hidden",
+            });
+
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: container,
+                    start: "top 80%",
+                    toggleActions: "play none none none",
+                },
+                defaults: {
+                    duration: 0.5,
+                    ease: "power3.out",
+                },
+            });
+
+            tl.from(splitTitle.words, {
+                yPercent: 100,
+                opacity: 0,
+                stagger: 0.04,
+            })
+                .from(
+                    splitSub.lines,
+                    {
+                        yPercent: 100,
+                        opacity: 0,
+                        stagger: 0.08,
+                    },
+                    "-=0.6",
+                )
+                .from("[data-animate]", {
+                    x: 50,
+                    filter: "blur(10px)",
+                    opacity: 0,
+                    stagger: 0.5,
+                });
+
+            const handleResize = () => {
+                splitTitle.revert();
+                splitSub.revert();
+                ScrollTrigger.refresh();
+            };
+
+            window.addEventListener("resize", handleResize);
+
+            return () => {
+                window.removeEventListener("resize", handleResize);
+            };
+        }, container);
+
+        return ctx;
+    }
+
+    initAnimation();
+</script>

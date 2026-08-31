@@ -1,0 +1,174 @@
+---
+import "swiper/css";
+import "swiper/css/pagination";
+
+import { Image } from "astro:assets";
+import ButtonLink from "@/components/ui/button-link.astro";
+
+import anishaAvatarImage from "@/assets/images/avatar-anisha.png";
+import aliAvatarImage from "@/assets/images/avatar-ali.png";
+import richardAvatarImage from "@/assets/images/avatar-richard.png";
+import shanaiAvatarImage from "@/assets/images/avatar-shanai.png";
+
+const testimonials = [
+    {
+        name: "Anisha Li",
+        image: anishaAvatarImage,
+        text: "“Manage has supercharged our team’s workflow. The ability to maintain visibility on larger milestones at all times keeps everyone motivated.”",
+    },
+    {
+        name: "Ali Bravo",
+        image: aliAvatarImage,
+        text: "“We have been able to cancel so many other subscriptions since using Manage. There is no more cross-channel confusion and everyone is much more focused.”",
+    },
+    {
+        name: "Richard Watts",
+        image: richardAvatarImage,
+        text: "“Manage allows us to provide structure and process. It keeps us organized and focused. I can’t stop recommending them to everyone I talk to!”",
+    },
+    {
+        name: "Shanai Gough",
+        image: shanaiAvatarImage,
+        text: "“Their software allows us to track, manage and collaborate on our projects from anywhere. It keeps the whole team in-sync without being intrusive.”",
+    },
+];
+---
+
+<section data-app-testi class="relative z-10">
+    <div class="w-full pb-16 px-4 xl:px-0 xl:pb-45 flex flex-col items-center">
+        <h2 data-split-title class="font-bold text-3xl xl:text-4xl leading-11 text-blue-950 xl:max-w-120 text-center mb-14">What they've said</h2>
+
+        <div data-animate class="min-h-93 xl:min-h-80 w-full">
+            <div class="swiper testimonial-swiper h-full w-full overflow-hidden">
+                <div class="swiper-wrapper h-full flex">
+                    {
+                        testimonials.map((testi) => (
+                            <div class="swiper-slide pt-8 w-full shrink-0">
+                                <article class="flex items-center flex-col gap-4 bg-gray-50 text-center relative px-6 pb-10">
+                                    <Image src={testi.image} alt={testi.name} width={65} class="-mt-8" />
+                                    <h3 class="font-bold text-blue-950">{testi.name}</h3>
+                                    <p class="text-blue-950/50 leading-8 xl:line-clamp-3">{testi.text}</p>
+                                </article>
+                            </div>
+                        ))
+                    }
+                </div>
+
+                <div class="swiper-pagination xl:hidden"></div>
+            </div>
+        </div>
+
+        <div data-animate>
+            <ButtonLink variant="primary">Get Started</ButtonLink>
+        </div>
+    </div>
+</section>
+
+<style is:global>
+    .swiper-pagination-bullet {
+        border: 1px solid hsl(12, 88%, 59%) !important;
+        background-color: transparent !important;
+    }
+    .swiper-pagination-bullet-active {
+        border: 1px solid hsl(12, 88%, 59%) !important;
+        background-color: hsl(12, 88%, 59%) !important;
+    }
+</style>
+
+<script>
+    import { gsap, ScrollTrigger, SplitText } from "@/utils/gsap";
+    import Swiper from "swiper";
+    import { Pagination, Autoplay } from "swiper/modules";
+
+    function initAnimation() {
+        const container = document.querySelector("[data-app-testi]");
+        if (!container) return;
+
+        const ctx = gsap.context(() => {
+            const titleEl = container.querySelector("[data-split-title]");
+
+            const splitTitle = new SplitText(titleEl, {
+                type: "lines,words",
+                linesClass: "overflow-hidden",
+            });
+
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: container,
+                    start: "top 80%",
+                    toggleActions: "play none none none",
+                },
+                defaults: {
+                    duration: 0.5,
+                    ease: "power3.out",
+                },
+            });
+
+            tl.from(splitTitle.words, {
+                yPercent: 100,
+                opacity: 0,
+                filter: "blur(10px)",
+                stagger: 0.04,
+            }).from("[data-animate]", {
+                y: 50,
+                filter: "blur(10px)",
+                opacity: 0,
+                stagger: 0.5,
+            });
+
+            const handleResize = () => {
+                splitTitle.revert();
+                ScrollTrigger.refresh();
+            };
+
+            window.addEventListener("resize", handleResize);
+
+            return () => {
+                window.removeEventListener("resize", handleResize);
+            };
+        }, container);
+
+        return ctx;
+    }
+
+    function initCarousel() {
+        const swiperElement = document.querySelector(".testimonial-swiper");
+        if (!swiperElement) return;
+
+        new Swiper(".testimonial-swiper", {
+            modules: [Pagination, Autoplay],
+
+            loop: true,
+            grabCursor: true,
+            spaceBetween: 20,
+
+            autoplay: {
+                delay: 3000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+            },
+
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+
+            breakpoints: {
+                320: {
+                    slidesPerView: 1,
+                },
+                768: {
+                    slidesPerView: 2,
+                    spaceBetween: 20,
+                },
+                1024: {
+                    slidesPerView: 3,
+                    spaceBetween: 20,
+                },
+            },
+        });
+    }
+
+    initCarousel();
+    initAnimation();
+</script>

@@ -1,10 +1,26 @@
 ---
-import MainLayout from "../layouts/main-layout.astro";
-import HeroSection from "../components/homepage/sections/hero-section.astro";
-import Navigation from "../components/shared/navigation.astro";
+import MainLayout from "@/layouts/main-layout.astro";
+import HeroSection from "@/components/homepage/sections/hero-section.astro";
+import FeatureSection from "@/components/homepage/sections/feature-section.astro";
+import TestimonialSection from "@/components/homepage/sections/testimonial-section.astro";
+import CTASection from "@/components/homepage/sections/cta-section.astro";
+import Footer from "@/components/homepage/sections/footer-section.astro";
 ---
 
 <MainLayout>
-    <Navigation />
-    <HeroSection />
+    <main>
+        <HeroSection />
+        <div class="relative">
+            <FeatureSection />
+            <div
+                data-speed="1.2"
+                class="absolute top-0 left-0 pointer-events-none w-full h-full bg-[url('/assets/images/bg-tablet-pattern.svg')] bg-no-repeat bg-size-[50rem] bg-position-[top_10em_right_calc((((100vw-375px)/2)+375px+10em))]"
+            >
+            </div>
+
+            <TestimonialSection />
+        </div>
+        <CTASection />
+        <Footer />
+    </main>
 </MainLayout>

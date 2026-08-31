@@ -10,6 +10,13 @@ interface Props extends HTMLAttributes<"a"> {
 const { variant, class: className, ...rest } = Astro.props;
 ---
 
-<a class={cn("bg-orange-400 text-gray-50 p-3 px-6 rounded-full shadow-md shadow-orange-400/30 hover:opacity-80 transition-opacity", className)} {...rest}>
+<a
+    class={cn(
+        "bg-orange-400 text-gray-50 p-3 px-6 rounded-full shadow-md shadow-orange-400/30 hover:opacity-80 transition-opacity w-max text-center",
+        variant === "secondary" && "bg-white text-orange-400",
+        className,
+    )}
+    {...rest}
+>
     <slot />
 </a>

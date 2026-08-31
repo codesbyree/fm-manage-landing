@@ -1,5 +1,65 @@
-<section class="h-[5000px] bg-blue-500 p-10 font-bold text-gray-50 text-2xl">
-    <h1 data-speed="1">Hello</h1>
-    <h2 data-speed="0.9">From</h2>
-    <h3 data-speed=".8">GSAP</h3>
+---
+import { Image } from "astro:assets";
+
+import ilustrationIntroImage from "@/assets/images/illustration-intro.svg";
+
+import ButtonLink from "@/components/ui/button-link.astro";
+---
+
+<section data-app-hero class="relative">
+    <div class="w-full max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 p-4 gap-4 xl:px-0 pt-25 pb-25 xl:pt-50 xl:gap-10 relative z-10">
+        <div class="relative z-10 row-start-2 xl:row-start-1 w-full flex flex-col gap-2 items-center text-center xl:text-left xl:items-start xl:justify-center">
+            <h1 data-animate class="text-blue-950 text-4xl font-bold xl:text-5xl xl:mb-5 leading-11 xl:leading-14 xl:tracking-tighter">
+                Bring everyone <br class="hidden md:block" /> toghether to build <br class="hidden md:block" /> better products.
+            </h1>
+            <p data-animate class="text-blue-950/50 text-lg font-normal mb-6 leading-7.5 xl:mb-8">
+                Manage makes it simple for software teams <br class="hidden md:block" /> to plan day-to-day tasks while keeping the <br class="hidden md:block" /> larger team goals in view.
+            </p>
+
+            <div data-animate>
+                <ButtonLink variant="primary"> Get Started </ButtonLink>
+            </div>
+        </div>
+
+        <div class="row-start-1">
+            <Image data-animate src={ilustrationIntroImage} alt="ilustration" class="w-full relative md:max-w-xl md:mx-auto xl:max-w-full xl:mx-0 z-2" />
+        </div>
+    </div>
+
+    <div
+        data-speed="1.2"
+        class="absolute top-0 left-0 pointer-events-none w-full h-full bg-[url('/assets/images/bg-tablet-pattern.svg')] bg-no-repeat bg-size-[28rem] bg-position-[top_-6em_left_calc((((100vw-375px)/2)+375px-20em))] md:bg-size-[40rem] md:bg-position-[top_-10em_left_calc((((100vw-768px)/2)+768px-20em))] xl:bg-size-[50rem] xl:bg-position-[top_-12em_left_calc((((100vw-1152px)/2)+1152px-30em))] 2xl:bg-position-[top_-10em_left_calc((((100vw-1152px)/2)+1152px-30em))]"
+    >
+    </div>
+
+    <div
+        data-speed="1.3"
+        class="absolute bottom-0 right-0 pointer-events-none w-full h-full bg-[url('/assets/images/bg-tablet-pattern.svg')] bg-no-repeat bg-size-[18rem] bg-position-[right_-10rem_bottom] md:hidden"
+    >
+    </div>
 </section>
+
+<script>
+    import { gsap } from "@/utils/gsap";
+
+    function initAnimation() {
+        const container = document.querySelector("[data-app-hero]");
+
+        if (!container) return;
+
+        const ctx = gsap.context(() => {
+            const tl = gsap.timeline({
+                defaults: {
+                    duration: 1,
+                    ease: "power3.out",
+                },
+            });
+
+            tl.from("[data-animate]", { y: 20, opacity: 0, filter: "blur(10px)", stagger: 0.2 }, 0);
+        }, container);
+
+        return ctx;
+    }
+
+    initAnimation();
+</script>
